@@ -76,38 +76,57 @@ class ExcludePlatformFilter(FilterReleaseFilePlugin):
             logger.error(f"Plugin {self.name}: missing platforms= setting")
             return
 
-        for platform in tags:
-            lplatform = platform.lower()
+        self._patterns = [
+            ".win32",
+            "-win32",
+            "macosx_",
+            "macosx-",
+            ".freebsd",
+            "-freebsd",
+            "bdist_rpm",
+            "-pp",
+            "-ip",
+            "-jy",
+            *[i for i in self._linuxPlatformTypes if "x86_64" not in i],
+        ]
+        self._packagetypes = ["bdist_dmg"]
 
-            if lplatform in ("windows", "win"):
-                # PEP 425
-                # see also setuptools/package_index.py
-                self._patterns.extend(self._windowsPlatformTypes)
-                # PEP 527
-                self._packagetypes.extend(["bdist_msi", "bdist_wininst"])
+        for version in tags:
+            if version in self._pythonversions:
+                self._patterns.extend(parse_version(version))
 
-            elif lplatform in ("macos", "macosx"):
-                self._patterns.extend(["macosx_", "macosx-"])
-                self._packagetypes.extend(["bdist_dmg"])
+        # for platform in tags:
+        #     lplatform = platform.lower()
 
-            elif lplatform in ("freebsd"):
-                # concerns only very few files
-                self._patterns.extend([".freebsd", "-freebsd"])
+        #     if lplatform in ("windows", "win"):
+        #         # PEP 425
+        #         # see also setuptools/package_index.py
+        #         self._patterns.extend(self._windowsPlatformTypes)
+        #         # PEP 527
+        #         self._packagetypes.extend(["bdist_msi", "bdist_wininst"])
 
-            elif lplatform in ("linux"):
-                self._patterns.extend(self._linuxPlatformTypes)
-                self._packagetypes.extend(["bdist_rpm"])
+        #     elif lplatform in ("macos", "macosx"):
+        #         self._patterns.extend(["macosx_", "macosx-"])
+        #         self._packagetypes.extend(["bdist_dmg"])
 
-            elif lplatform in self._pythonversions:
-                lversion = lplatform
-                self._patterns.extend(parse_version(lversion))
+        #     elif lplatform in ("freebsd"):
+        #         # concerns only very few files
+        #         self._patterns.extend([".freebsd", "-freebsd"])
 
-            # check for platform specific architectures
-            elif lplatform in self._windowsPlatformTypes:
-                self._patterns.extend([lplatform])
+        #     elif lplatform in ("linux"):
+        #         self._patterns.extend(self._linuxPlatformTypes)
+        #         self._packagetypes.extend(["bdist_rpm"])
 
-            elif lplatform in self._linuxPlatformTypes:
-                self._patterns.extend([lplatform])
+        #     elif lplatform in self._pythonversions:
+        #         lversion = lplatform
+        #         self._patterns.extend(parse_version(lversion))
+
+        #     # check for platform specific architectures
+        #     elif lplatform in self._windowsPlatformTypes:
+        #         self._patterns.extend([lplatform])
+
+        #     elif lplatform in self._linuxPlatformTypes:
+        #         self._patterns.extend([lplatform])
 
         logger.info(f"Initialized {self.name} plugin with {self._patterns!r}")
 

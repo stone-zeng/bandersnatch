@@ -50,7 +50,7 @@ class Master:
         # testing self.proxy_kwargs b/c even if there is a proxy_url, get_aiohttp_proxy_kwargs may
         # still return {} if the url is invalid somehow
         if self.proxy_kwargs:
-            logging.info("Using proxy URL %s", proxy_url)
+            logger.info("Using proxy URL %s", proxy_url)
 
         self.allow_non_https = allow_non_https
         if self.url.startswith("http://") and not self.allow_non_https:

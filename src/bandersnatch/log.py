@@ -5,13 +5,9 @@ import logging
 from typing import Any
 
 
-def setup_logging(args: Any) -> logging.StreamHandler:
-    ch = logging.StreamHandler()
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)s: %(message)s (%(filename)s:%(lineno)d)"
+def setup_logging(args: Any):
+    logging.basicConfig(
+        format="%(asctime)s %(levelname)s: %(message)s (%(filename)s:%(lineno)d)"
     )
-    ch.setFormatter(formatter)
     logger = logging.getLogger("bandersnatch")
     logger.setLevel(logging.DEBUG if args.debug else logging.INFO)
-    logger.addHandler(ch)
-    return ch
